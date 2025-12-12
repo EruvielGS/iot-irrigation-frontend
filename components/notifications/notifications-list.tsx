@@ -48,7 +48,7 @@ export function NotificationsList({ notifications }: NotificationsListProps) {
                   <div className="space-y-1">
                     <p className="text-sm font-medium leading-none">{notif.title}</p>
                     <p className="text-xs text-muted-foreground">{notif.message}</p>
-                    <p className="text-[10px] text-muted-foreground/70">
+                    <p className="text-[10px] text-muted-foreground/70" suppressHydrationWarning>
                       {formatDistanceToNow(new Date(notif.timestamp), { locale: es, addSuffix: true })}
                     </p>
                   </div>

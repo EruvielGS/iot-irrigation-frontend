@@ -7,6 +7,7 @@ import {
   GenericCommandPayload,
   PlantDeviceUpdateDto,
   PlantAlert,
+  CreateDeviceRequest,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
@@ -19,11 +20,11 @@ export const apiService = {
     return res.json();
   },
 
-  createDevice: async (plantId: string, name: string, userId: string): Promise<PlantDevice> => {
+  createDevice: async (request: CreateDeviceRequest): Promise<PlantDevice> => {
     const res = await fetch(`${API_URL}/devices`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plantId, name, userId }),
+      body: JSON.stringify(request),
     });
 
     if (!res.ok) {
@@ -31,6 +32,17 @@ export const apiService = {
       throw new Error(errorMsg || "Error creando dispositivo");
     }
     return res.json();
+  },
+
+  deleteDevice: async (plantId: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/devices/${plantId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const errorMsg = await res.text();
+      throw new Error(errorMsg || "Error eliminando dispositivo");
+    }
   },
 
   getDeviceDetails: async (plantId: string): Promise<PlantDevice> => {
@@ -140,5 +152,24 @@ export const apiService = {
     });
 
     if (!res.ok) throw new Error("Error marking alert as read");
+  },
+
+  getAllAlerts: async (): Promise<PlantAlert[]> => {
+    const devices = await apiService.getDevices();
+    const alertsPromises = devices.map(device => 
+      apiService.getAlertsByPlant(device.plantId, 20)
+    );
+    const alertsArrays = await Promise.all(alertsPromises);
+    return alertsArrays.flat().sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+  },
+
+  sendTestNotification: async (plantId: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/devices/${plantId}/test-notification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Error sending test notification");
   },
 };

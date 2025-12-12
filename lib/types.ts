@@ -6,6 +6,7 @@ export interface PlantDevice {
   name: string;
   description?: string;
   macAddress?: string;
+  ownerEmail?: string;  // Email para notificaciones
 
   // Umbrales
   minHumidity?: number;
@@ -153,6 +154,13 @@ export interface AlertData {
 }
 
 // Requests
+export interface CreateDeviceRequest {
+  plantId: string;
+  name: string;
+  userId: string;
+  ownerEmail?: string;  // Email para recibir notificaciones
+}
+
 export interface GenericCommandPayload {
   command: DeviceCommand;
 }
