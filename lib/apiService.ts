@@ -85,6 +85,13 @@ export const apiService = {
     return res.json();
   },
 
+  // Obtener datos en tiempo real
+  getRealtimeData: async (plantId: string): Promise<KpiDto> => {
+    const res = await fetch(`${API_URL}/analytics/${plantId}/realtime`);
+    if (!res.ok) throw new Error("Error fetching realtime data");
+    return res.json();
+  },
+
   getTemperatureHistory: async (
     plantId: string,
     range: string = "24h"
@@ -120,9 +127,14 @@ export const apiService = {
 
   getHistoryCombined: async (
     plantId: string,
-    range: string = "24h"
+    range: string = "72h",
+    window?: string
   ): Promise<CombinedHistoryData[]> => {
-    const res = await fetch(`${API_URL}/analytics/${plantId}/history/combined?range=${range}`);
+    const params = new URLSearchParams({ range });
+    if (window) params.append('window', window);
+    const url = `${API_URL}/analytics/${plantId}/history/combined?${params.toString()}`;
+    console.log(`📡 Llamando API con URL: ${url}`);
+    const res = await fetch(url);
     if (!res.ok) throw new Error("Error fetching combined history");
     return res.json();
   },

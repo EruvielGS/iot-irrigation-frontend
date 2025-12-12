@@ -49,10 +49,11 @@ export default function Dashboard() {
       const alerts = await apiService.getAllAlerts()
       // Convertir alertas a formato Notification
       const notifs: Notification[] = alerts.map(alert => ({
-        id: alert._id?.toString() || Math.random().toString(),
+        id: alert.id || Math.random().toString(),
         deviceId: alert.plantId,
+        title: alert.message,
         message: alert.message,
-        type: alert.severity === "CRITICAL" ? "alert" : alert.severity === "WARNING" ? "warning" : "info",
+        type: alert.severity === "CRITICA" ? "error" : alert.severity === "ALERTA" ? "warning" : "info",
         timestamp: alert.timestamp,
         read: alert.isRead || false,
       }))
@@ -383,22 +384,46 @@ export default function Dashboard() {
                             <p className="text-xs text-muted-foreground">{device.plantId}</p>
                           </div>
                           <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={async () => {
-                                try {
-                                  await apiService.sendTestNotification(device.plantId)
-                                  toast.success("Notificación de prueba enviada")
-                                  fetchNotifications()
-                                } catch (error) {
-                                  toast.error("Error al enviar notificación")
-                                }
-                              }}
-                            >
-                              <Bell className="h-3 w-3 mr-1" />
-                              Prueba
-                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                >
+                                  <Bell className="h-3 w-3 mr-1" />
+                                  Prueba
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>¿Enviar notificación de prueba?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Se enviará un email de prueba a la dirección configurada para el dispositivo{" "}
+                                    <span className="font-semibold">{device.name}</span> ({device.plantId}).
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={async () => {
+                                      try {
+                                        await apiService.sendTestNotification(device.plantId)
+                                        toast.success("✅ Notificación de prueba enviada exitosamente", {
+                                          description: `Email enviado a ${device.ownerEmail || 'dirección configurada'}`
+                                        })
+                                        fetchNotifications()
+                                      } catch (error: any) {
+                                        toast.error("❌ Error al enviar notificación", {
+                                          description: error.message || "No se pudo enviar el email"
+                                        })
+                                      }
+                                    }}
+                                  >
+                                    Enviar
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button

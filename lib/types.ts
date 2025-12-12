@@ -86,14 +86,12 @@ export enum DeviceCommand {
 
 // DTOs
 export interface KpiDto {
-  currentTemp: number;
-  currentSoil: number;
-  currentLight: number;
-  currentHumidity: number;
-  healthIndex: number;
-  dataQuality: number;
-  lastUpdate: string;
+  temp: number;
+  soilHum: number;
+  ambientHum: number;
+  light: number;
   pumpOn: boolean;
+  timestamp: string;
 }
 
 export interface ChartPointDto {
