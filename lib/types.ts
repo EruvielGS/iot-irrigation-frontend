@@ -92,6 +92,8 @@ export interface KpiDto {
   light: number;
   pumpOn: boolean;
   timestamp: string;
+  healthIndex?: number;  // Índice de salud de la planta (0-100)
+  dataQuality?: number;  // Calidad de datos recibidos (0-100)
 }
 
 export interface ChartPointDto {

@@ -22,6 +22,7 @@ import { Droplets, Thermometer, Sun, Activity, TrendingUp } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { KpiGrid } from "./kpi-grid"
 
 interface PlantDetailsModalProps {
   device: PlantDevice | null
@@ -191,71 +192,24 @@ export function PlantDetailsModal({ device, isOpen, onClose }: PlantDetailsModal
             <div>
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <Activity className="h-5 w-5 text-green-500" />
-                Lecturas en Tiempo Real
+                Lecturas en Tiempo Real y Métricas de Salud
               </h3>
-              <div className="grid grid-cols-4 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <Thermometer className="h-4 w-4 text-orange-500" />
-                      Temperatura
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{kpis?.temp?.toFixed(1) ?? "--"}°C</div>
-                    <p className="text-xs text-muted-foreground" suppressHydrationWarning>
-                      Actualizado: {kpis?.timestamp ? new Date(kpis.timestamp).toLocaleTimeString() : "--"}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Droplets className="h-4 w-4 text-blue-500" />
-                    Humedad Suelo
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{kpis?.soilHum ?? "--"}%</div>
-                  <Badge variant={kpis && kpis.soilHum < 35 ? "destructive" : "default"}>
-                    {kpis && kpis.soilHum < 35 ? "Crítico" : "Normal"}
-                  </Badge>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Sun className="h-4 w-4 text-yellow-500" />
-                    Luz
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{kpis?.light ?? "--"} lux</div>
-                  <p className="text-xs text-muted-foreground">Intensidad lumínica</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Droplets className="h-4 w-4 text-cyan-500" />
-                    Humedad Ambiente
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{kpis?.ambientHum ?? "--"}%</div>
-                  <p className="text-xs text-muted-foreground">Humedad relativa</p>
-                </CardContent>
-              </Card>
-              </div>
+              {kpis && device ? (
+                <KpiGrid kpi={kpis} device={device} />
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  ⏳ Cargando datos de sensores...
+                </div>
+              )}
             </div>
 
-            {/* Controles de Actuadores */}
+            {/* Control de Riego */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Control Manual de Riego</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Droplets className="h-5 w-5 text-blue-500" />
+                  Control de Riego
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <AlertDialog>
